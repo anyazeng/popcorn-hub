@@ -11,17 +11,28 @@ const starContainerStyle = {
   display: "flex",
 };
 
-const textStyle = {
-  lineHeight: "1",
-  margin: "0",
-};
-
-function StarRating({ maxRating = 5 }) {
-  const [rating, setRating] = useState(0);
+function StarRating({
+  maxRating = 5,
+  color = "#fcc419",
+  size = 48,
+  className = "",
+  msg = [],
+  defaultRating = 0,
+  onSetMovieRating, //it allows external component to get access to the state insite here
+}) {
+  const [rating, setRating] = useState(defaultRating);
   const [tempRating, setTempRating] = useState(0);
 
   const handleRating = (i) => {
-    setRating(i + 1);
+    setRating(i + 1); //set internal rating
+    onSetMovieRating(i + 1); //set external rating
+  };
+
+  const textStyle = {
+    lineHeight: "1",
+    margin: "0",
+    color,
+    fontSize: `${size}/1.5px `,
   };
 
   return (
@@ -34,10 +45,16 @@ function StarRating({ maxRating = 5 }) {
             onRate={() => handleRating(i)}
             onHoverIn={() => setTempRating(i + 1)}
             onHoverOut={() => setTempRating(0)}
+            size={size}
+            color={color}
           />
         ))}
       </div>
-      <p style={textStyle}>{tempRating || rating || ""}</p>
+      <p style={textStyle}>
+        {msg.length === maxRating
+          ? msg[tempRating ? tempRating - 1 : rating - 1]
+          : tempRating || rating || ""}
+      </p>
     </div>
   );
 }
