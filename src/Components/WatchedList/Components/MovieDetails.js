@@ -1,10 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useDeferredValue, useEffect, useState } from "react";
 import StarRating from "../../StarRating";
 
-function MovieDetails({ selectedId, onCloseMovie }) {
+function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   const [movie, setMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [userRating, setUserRating] = useState("");
   const KEY = "6a15263b";
+
+  const watchedUserRating = watched.find(
+    (movie) => movie.imdbID === selectedId
+  )?.userRating;
 
   const {
     Title: title,
@@ -36,6 +41,23 @@ function MovieDetails({ selectedId, onCloseMovie }) {
     return <p className="loader">LOADING...</p>;
   }
 
+  const handleAdd = () => {
+    const newWatchedMovie = {
+      imdbID: selectedId,
+      title,
+      year,
+      poster,
+      imdbRating: Number(imdbRating),
+      runtime: Number(runtime.split(" ").at[0]),
+      userRating,
+    };
+
+    onAddWatched(newWatchedMovie);
+    onCloseMovie();
+  };
+
+  const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
+
   return (
     <div className="details">
       {isLoading ? (
@@ -46,6 +68,7 @@ function MovieDetails({ selectedId, onCloseMovie }) {
             <button className="btn-back" onClick={onCloseMovie}>
               &larr;
             </button>
+
             <img src={poster} alt={`Poster of ${title}`} />
             <div className="details-overview">
               <h2>{title}</h2>
@@ -61,7 +84,29 @@ function MovieDetails({ selectedId, onCloseMovie }) {
           </header>
           <section>
             <div className="rating">
-              <StarRating maxRating={10} size={24} />
+              {!isWatched ? (
+                <>
+                  <StarRating
+                    maxRating={10}
+                    size={24}
+                    onSetMovieRating={setUserRating}
+                  />
+
+                  {userRating > 0 && (
+                    <button className="btn-add" onClick={handleAdd}>
+                      +Add Watched
+                    </button>
+                  )}
+                </>
+              ) : (
+                <div>
+                  <p>
+                    You have rated this moive with{" "}
+                    <span>{watchedUserRating}</span>
+                    <span> 🌟</span>. 🎬
+                  </p>
+                </div>
+              )}
             </div>
             <p>
               <i>{plot}</i>

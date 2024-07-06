@@ -16,9 +16,8 @@ export default function App() {
   const [query, setQuery] = useState("inception");
   const [selectedId, setSelectedId] = useState("tt1375666");
 
-  const KEY = "6a15263b";
-
   //We need to place the async function in a new function. Because Effect callbacks are sychronous to prevent race conditions, the function can not return a promise.
+  const KEY = "6a15263b";
 
   useEffect(() => {
     async function fetchMovies() {
@@ -77,6 +76,14 @@ export default function App() {
     setSelectedId(null);
   };
 
+  const handleAddWatched = (movie) => {
+    setWatched((watched) => [...watched, movie]);
+  };
+
+  const handleDeleteWatched = (id) => {
+    setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
+  };
+
   return (
     <>
       <NavBar>
@@ -97,11 +104,16 @@ export default function App() {
             <MovieDetails
               selectedId={selectedId}
               onCloseMovie={handleCloseMovie}
+              onAddWatched={handleAddWatched}
+              watched={watched}
             />
           ) : (
             <>
               <WatchedSummary watched={watched} />
-              <WatchedMoviesList watched={watched} />
+              <WatchedMoviesList
+                watched={watched}
+                onDeleteWatched={handleDeleteWatched}
+              />
             </>
           )}
         </ListBox>
