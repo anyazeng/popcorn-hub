@@ -9,7 +9,7 @@ import WatchedMoviesList from "./Components/WatchedList/Components/WatchedMovies
 import MovieDetails from "./Components/WatchedList/Components/MovieDetails";
 
 export default function App() {
-  const [movies, setMovies] = useState(tempMovieData);
+  const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState(tempWatchedData);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");

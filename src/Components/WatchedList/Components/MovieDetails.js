@@ -41,6 +41,11 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     function () {
       if (!title) return; //prevent showing 'undefined'
       document.title = `Movie | ${title}`;
+      //Clean up function
+      //run after the componet is unmounted
+      return function () {
+        document.title = "Popcornhub";
+      };
     },
     [title]
   );
