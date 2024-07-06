@@ -19,41 +19,53 @@ export default function App() {
   //We need to place the async function in a new function. Because Effect callbacks are sychronous to prevent race conditions, the function can not return a promise.
   const KEY = "6a15263b";
 
-  useEffect(() => {
-    async function fetchMovies() {
-      try {
-        setIsLoading(true);
-        setError("");
-        const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
-        );
-        //CHECK if fetching is successful
-        if (!res.ok) {
-          throw new Error("Something went wrong with fetching movies");
+  useEffect(
+    function () {
+      const controller = new AbortController();
+
+      async function fetchMovies() {
+        try {
+          setIsLoading(true);
+          setError("");
+          const res = await fetch(
+            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+            { signal: controller.signal }
+          );
+          //CHECK if fetching is successful
+          if (!res.ok) {
+            throw new Error("Something went wrong with fetching movies");
+          }
+
+          const data = await res.json();
+          //WHEN DATA NOT FOUND -> data undefined
+          if (data.Response === "False") throw new Error("Movie not found");
+
+          setMovies(data.Search);
+          setError("");
+        } catch (err) {
+          console.log(err.message);
+          if (err.name !== "AbortError") {
+            setError(err.message);
+          }
+        } finally {
+          //When there is a new Error -> return, so the logic below is to make sure loading is set to false at the end
+          setIsLoading(false);
         }
-
-        const data = await res.json();
-        //WHEN DATA NOT FOUND -> data undefined
-        if (data.Response === "False") throw new Error("Movie not found");
-
-        setMovies(data.Search);
-        console.log(data);
-      } catch (err) {
-        // console.log(err.message);
-        setError(err.message);
-      } finally {
-        //When there is a new Error -> return, so the logic below is to make sure loading is set to false at the end
-        setIsLoading(false);
       }
-    }
-    if (query.length < 3) {
-      setMovies([]);
-      setError("");
-      return;
-    }
+      if (query.length < 3) {
+        setMovies([]);
+        setError("");
+        return;
+      }
 
-    fetchMovies();
-  }, [query]);
+      fetchMovies();
+
+      return function () {
+        controller.abort();
+      };
+    },
+    [query]
+  );
 
   function Loader() {
     return <p className="loader">LOADING...</p>;
