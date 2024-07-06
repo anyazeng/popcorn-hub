@@ -37,6 +37,14 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     getMovieDetails();
   }, [selectedId]);
 
+  useEffect(
+    function () {
+      if (!title) return; //prevent showing 'undefined'
+      document.title = `Movie | ${title}`;
+    },
+    [title]
+  );
+
   function Loader() {
     return <p className="loader">LOADING...</p>;
   }
