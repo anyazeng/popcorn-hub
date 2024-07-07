@@ -10,15 +10,16 @@ import MovieDetails from "./Components/WatchedList/Components/MovieDetails";
 
 export default function App() {
   const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState(tempWatchedData);
+  const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [query, setQuery] = useState("inception");
-  const [selectedId, setSelectedId] = useState("tt1375666");
+  const [query, setQuery] = useState("");
+  const [selectedId, setSelectedId] = useState(null);
 
   //We need to place the async function in a new function. Because Effect callbacks are sychronous to prevent race conditions, the function can not return a promise.
   const KEY = "6a15263b";
 
+  //start fetching on mount
   useEffect(
     function () {
       const controller = new AbortController();
@@ -43,7 +44,6 @@ export default function App() {
           setMovies(data.Search);
           setError("");
         } catch (err) {
-          console.log(err.message);
           if (err.name !== "AbortError") {
             setError(err.message);
           }
@@ -58,6 +58,8 @@ export default function App() {
         return;
       }
 
+      //when serching, close the movie details
+      handleCloseMovie();
       fetchMovies();
 
       return function () {
