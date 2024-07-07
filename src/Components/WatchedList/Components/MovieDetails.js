@@ -5,7 +5,7 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   const [movie, setMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState("");
-  const KEY = "6a15263b";
+  const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
 
   const watchedUserRating = watched.find(
     (movie) => movie.imdbID === selectedId
@@ -24,6 +24,24 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     Genre: genre,
   } = movie;
 
+  //When press esc key, colse MovieDetails
+  useEffect(() => {
+    //Specify effect
+    function closeMovieDetails(e) {
+      if (e.code === "Escape") {
+        onCloseMovie();
+        console.log("Closing");
+      }
+    }
+    //listen for the event
+    document.addEventListener("keydown", closeMovieDetails);
+    //remove event listenr when each time the component unmounted/re-rendered
+    return () => {
+      document.removeEventListener("keydown", closeMovieDetails);
+    };
+  }, [onCloseMovie]);
+
+  const KEY = "6a15263b";
   useEffect(() => {
     async function getMovieDetails() {
       setIsLoading(true);
@@ -68,8 +86,6 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     onAddWatched(newWatchedMovie);
     onCloseMovie();
   };
-
-  const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
 
   return (
     <div className="details">
