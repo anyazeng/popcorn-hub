@@ -10,11 +10,53 @@ import MovieDetails from "./Components/WatchedList/Components/MovieDetails";
 
 export default function App() {
   const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null);
+  const [watched, setWatched] = useState(function () {
+    const storedValue = localStorage.getItem("watched");
+    return JSON.parse(storedValue);
+  });
+
+  function Loader() {
+    return <p className="loader">LOADING...</p>;
+  }
+
+  function ErrorMessage({ message }) {
+    return (
+      <p className="error">
+        <span>🌚</span>
+        {message}
+      </p>
+    );
+  }
+
+  const handleSelectMovie = (id) => {
+    setSelectedId((selectedId) => (id === selectedId ? null : id));
+  };
+
+  const handleCloseMovie = (id) => {
+    setSelectedId(null);
+  };
+
+  const handleAddWatched = (movie) => {
+    setWatched((watched) => [...watched, movie]);
+
+    // localStorage.setItem("watched", JSON.stringify([...watched, movie]));
+  };
+
+  const handleDeleteWatched = (id) => {
+    setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
+  };
+
+  //store data in localStorage
+  useEffect(
+    function () {
+      localStorage.setItem("watched", JSON.stringify(watched));
+    },
+    [watched]
+  );
 
   //We need to place the async function in a new function. Because Effect callbacks are sychronous to prevent race conditions, the function can not return a promise.
   const KEY = "6a15263b";
@@ -58,7 +100,7 @@ export default function App() {
         return;
       }
 
-      //when serching, close the movie details
+      //when searching, close the movie details
       handleCloseMovie();
       fetchMovies();
 
@@ -68,35 +110,6 @@ export default function App() {
     },
     [query]
   );
-
-  function Loader() {
-    return <p className="loader">LOADING...</p>;
-  }
-
-  function ErrorMessage({ message }) {
-    return (
-      <p className="error">
-        <span>🌚</span>
-        {message}
-      </p>
-    );
-  }
-
-  const handleSelectMovie = (id) => {
-    setSelectedId((selectedId) => (id === selectedId ? null : id));
-  };
-
-  const handleCloseMovie = (id) => {
-    setSelectedId(null);
-  };
-
-  const handleAddWatched = (movie) => {
-    setWatched((watched) => [...watched, movie]);
-  };
-
-  const handleDeleteWatched = (id) => {
-    setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
-  };
 
   return (
     <>
