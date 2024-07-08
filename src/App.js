@@ -36,18 +36,16 @@ export default function App() {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
   };
 
-  const handleCloseMovie = (id) => {
-    setSelectedId(null);
-  };
-
   const handleAddWatched = (movie) => {
     setWatched((watched) => [...watched, movie]);
-
-    // localStorage.setItem("watched", JSON.stringify([...watched, movie]));
   };
 
   const handleDeleteWatched = (id) => {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
+  };
+
+  const handleCloseMovie = (id) => {
+    setSelectedId(null);
   };
 
   //store data in localStorage

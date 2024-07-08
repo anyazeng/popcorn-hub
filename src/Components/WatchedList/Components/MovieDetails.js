@@ -30,7 +30,6 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     function closeMovieDetails(e) {
       if (e.code === "Escape") {
         onCloseMovie();
-        console.log("Closing");
       }
     }
     //listen for the event
